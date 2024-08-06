@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech to Text Converter</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        button {
+            font-size: 1.1rem;
+            padding: 12px 24px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #transcript {
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            height: 150px;
+            overflow-y: auto;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #transcript {
+            animation: fadeIn 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <h1>Speech to Text Converter</h1>
+    <button id="start">Start Listening</button>
+    <button id="stop" disabled>Stop Listening</button>
+    <p id="transcript"></p>
+
+    <script>
+        // Check if the browser supports the Web Speech API
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+
+            // Set recognition properties
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            // Start listening when the user clicks the button
+            document.getElementById('start').onclick = function() {
+                recognition.start();
+                document.getElementById('start').disabled = true;
+                document.getElementById('stop').disabled = false;
+            };
+
+            // Stop listening when the user clicks the button
+            document.getElementById('stop').onclick = function() {
+                recognition.stop();
+                document.getElementById('start').disabled = false;
+                document.getElementById('stop').disabled = true;
+            };
+
+            // Process the results
+            recognition.onresult = function(event) {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                document.getElementById('transcript').innerText = transcript;
+            };
+
+            // Handle errors
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error detected: ' + event.error);
+            };
+        } else {
+            alert('Sorry, your browser does not support the Web Speech API.');
+        }
+    </script>
+</body>
+</html>
